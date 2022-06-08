@@ -1,0 +1,4 @@
+overpy~=0.6
+pandas~=1.4.2
+phonenumbers~=8.12.49
+requests~=2.27.1
