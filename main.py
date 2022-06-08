@@ -74,8 +74,10 @@ def get_nodes(overpass_query):
     for node in queried_nodes:
         node_ids.append(node.id)
 
-    queried_nodes = get_node_data_bulk(node_ids)
-    return queried_nodes
+    if len(node_ids) > 0:
+        return get_node_data_bulk(node_ids)
+    else:
+        return []
 
 
 def is_valid_phone_number(phone_number, country_code):
@@ -124,6 +126,9 @@ if __name__ == '__main__':
     overpass_query = 'area["ISO3166-2"="%s-%s"]->.boundary;node(area.boundary)["phone"];out;' % (
     tag_key, tag_value)
     nodes = get_nodes(overpass_query)
+
+    if len(nodes) == 0:
+        print("No nodes matched with your query")
 
     # Processing nodes
     nodes_to_be_updated = []
