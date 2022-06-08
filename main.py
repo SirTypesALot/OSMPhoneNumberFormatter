@@ -123,7 +123,7 @@ if __name__ == '__main__':
     tag_value = 'NL-GR'
 
     # Getting nodes from OSM
-    overpass_query = 'area["ISO3166-2"="%s-%s"]->.boundary;node(area.boundary)["phone"];out;' % (
+    overpass_query = 'area["%s"="%s"]->.boundary;node(area.boundary)["phone"];out;' % (
     tag_key, tag_value)
     nodes = get_nodes(overpass_query)
 
