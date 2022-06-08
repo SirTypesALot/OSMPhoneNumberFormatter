@@ -117,12 +117,12 @@ def separate_tag_values(tag_value):
 
 if __name__ == '__main__':
 
-    country_code = 'NL'
-    province_code = 'NH'
+    tag_key = 'ISO3166-2'
+    tag_value = 'NL-GR'
 
     # Getting nodes from OSM
     overpass_query = 'area["ISO3166-2"="%s-%s"]->.boundary;node(area.boundary)["phone"];out;' % (
-    country_code, province_code)
+    tag_key, tag_value)
     nodes = get_nodes(overpass_query)
 
     # Processing nodes
@@ -131,6 +131,7 @@ if __name__ == '__main__':
 
     for counter, node in enumerate(nodes):
         phone_numer_tags = ['phone', 'contact:phone', 'contact:mobile', 'fax', 'contact:fax']
+        update_node = False
 
         # Phone number format correction
         for tag_key in phone_numer_tags:
@@ -145,11 +146,14 @@ if __name__ == '__main__':
                         formatted_phone_number = format_phone_number(original_phone_number, 'NL')
                         formatted_phone_numbers.append(formatted_phone_number)
                     else:
-                        print("INVALID VALUE Node %d Key %s:  %s" % (node['id'], tag_key, original_phone_number))
                         formatted_phone_numbers.append(original_phone_number)
 
-                if (len(formatted_phone_numbers) > 0) & (
-                        ';'.join(original_phone_numbers) != '; '.join(formatted_phone_numbers)):
-                    print("Node %d Key %s:  '%s'  ==>  '%s'" % (
-                        node['id'], tag_key, ';'.join(original_phone_numbers), '; '.join(formatted_phone_numbers)))
-                    test.append([node['id'], ';'.join(original_phone_numbers), '; '.join(formatted_phone_numbers)])
+                if original_phone_numbers != formatted_phone_numbers:
+                    print("Node %s Key %s:  %s ==>  %s" % (
+                    node['id'], tag_key, ';'.join(original_phone_numbers), '; '.join(formatted_phone_numbers)))
+                    node['tag'][tag_key] = '; '.join(formatted_phone_numbers)
+                    update_node = True
+
+        # Check if the node needs to be updated or not
+        if update_node:
+            nodes_to_be_updated.append(node)
